@@ -1,91 +1,83 @@
-from adding_id_pwd import *
-
-#signin for existing user
+#-------------------SignIn/SignUp Procedure--------------------------
+#signin for existing user.....
 def signin(UD):
-    users=data()
+    users=[UD[i][0] for i in range(len(UD))]
+    print(users)
     i=1
     while i <= 3:
         userid = input("Enter userid: ")  # asking userid
         ind = 0
         if userid in users:
-            # print('Userid:',userid)
             ind = users.index(userid)
-            # print('index: ',ind)
             pswd = input("Enter Password: ")
-            # print('pswd:',UD[ind][1])
             if pswd == UD[ind][1]:
                 print('Access Granted...Yurekhaa...')
+                cre=input('Do you wanna remove the credentials--Press ("Y")\n-->Press Enter to Exit: ')
+                if cre.lower()=="y":
+                    deleting(data,UD[ind])
+                    print("Your credentials successfully removed")
                 break
             else:
-                print('Enter Valid Password---\n---', 3 - i,' attempts remaining...')
-                i=i+1
-                continue
-            break
+                print('Enter Valid Username/Password---\n---', 3 - i,' attempts remaining...')
+                i+=1
         else:
             print("Enter Valid Userid---\n---", 3 - i, ' attempts remaining...')
-            i = i + 1
+            i+=1
     if i==4:
-        print("---User doesn't Exists---")
-        while True:
-            value = input("Do you want to register as new user ?:(Enter 'Y'):\n--Enter any other key to exit--::")
-            if value.lower() == 'y':
-                signup(UD)
-                break
-            else:
-                break
-
+        print("---User not found---")
+        val = input("-->Do you wanna register as new user--Press('Y'):\n-->Press Enter to exit--::")
+        if val.lower() == 'y':
+            signup(UD)
 #-------------------------------------------------------------
-#print(users)
+#signup for new user......
 def signup(UD):
-    ud=UD
-    users=data()
+    users=[UD[i][0] for i in range(len(UD))]
     new=[]
     j=1
     while j<=3:
         print('---use combo of alphabets and numbers only---')
         userid=input("Set your Userid: ")
-        if userid not in users:
-            if userid.isalnum():
-                new.append(userid)
-                #print('valid:', new)
-                i=1
-                while i<=3:
-                    print('---use combo of alphabets and numbers only---')
-                    pswd=input("Set Your Password: ")
-                    if pswd.isalnum():
-                        new.append(pswd)
-                        #print('valid: ', new)
-                        break
-                    else:
-                        i=i+1
+        if userid and userid not in users:
+            pswd = input("Set Your Password: ")
+            if userid.isalnum() and pswd.isalnum() :
+                new+=[userid,pswd]
                 break
             else:
                 j=j+1
         else:
-            print('---Userid is alredy Existed---')
+            print('---Userid alredy Existed/invalid input---')
             j=j+1
-    while j<=3:
-        if len(new) == 2:
-            add_userid(new[0])
-            add_pswd(new[1])
-            ud.append(new)
-            break
-        else:
-            print('---Invalid Input---Try Again---')
+    if len(new) == 2:
+        fa = open('data', 'a')
+        fa.write(new[0] + '-' + new[1]+'::')
+        fa.close()
+        UD.append(new)
+        val = input("-->Do You Want To Signin--press('Y')\n-->Do you want to Signup--press('N')\n-->Press Enter to exit:: ")
+        if val.lower() == 'y':
+            signin(UD)
+        elif val.lower() == 'n':
             signup(UD)
-   # print(ud)
-    while j<=3:
-        val=input("---Do You Want To Signin...---('Y' or'N'):\n--Enter any other key to exit--:: ")
-        if val.lower()=='y':
-            signin(ud)
-            break
-        elif val.lower()=='n':
-            reg=input("Do you want to register as new user ?:(Enter 'Y'):\n--Enter any other key to exit--::")
-            if reg.lower()=='y':
-                signup(ud)
-                break
-            else:
-                break
-        else:
-            break
+    else:
+        print('-------------Try Again------------')
 #-------------------------------------------------------------------------------------------------------
+#deleting user credentials from database
+def deleting(data,credentials):
+    data.remove(credentials)
+    fo=open('data','w')
+    for i in data:
+        fo.write('-'.join(i)+'::')
+    fo.close()
+#--------------------------------------------------------------------------------------------------
+f = open('data')
+fr = f.read()
+data=[((i.strip()).split('-')) for i in fr.split('::')]
+data.pop()
+print(data)
+ask=input("----User Signin/Signup procedure----\n-->For SignIn--Press ('Y')\n-->For SignUp--Press ('N')\n-->Press Enter to 'Exit'::")
+if ask.lower() == 'y':
+    print('-----SignIn-----')
+    signin(data)
+elif ask.lower() == 'n':
+    print('-----SignUp-----')
+    signup(data)
+#------------------------------------------------------------------
